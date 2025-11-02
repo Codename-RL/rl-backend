@@ -14,22 +14,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Cloudflared
-        run: |
-          echo "===> Installing Cloudflared"
-          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
-          chmod +x cloudflared
-          sudo mv cloudflared /usr/local/bin/cloudflared
-
-      - name: SSH into server via Cloudflare and deploy
-        uses: appleboy/ssh-action@v1.2.0
+      - name: Connect via Cloudflare SSH and deploy
+        uses: and-fm/cloudflared-ssh-action@v3
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          port: 22
-          proxy_command: "cloudflared access ssh --hostname ${{ secrets.SERVER_HOST }}"
-          script: |
+          host: ${{ secrets.SERVER_HOST }}                     # e.g. ssh.lafavela.site
+          username: ${{ secrets.SERVER_USER }}             # e.g. dimas
+          private_key_filename: id_ed25519
+          private_key_value: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          service_token_id: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_ID }}
+          service_token_secret: ${{ secrets.CLOUDFLARE_ACCESS_CLIENT_SECRET }}
+          commands: |
             set -e
 
             echo "===> Switching to app directory"

@@ -3,7 +3,8 @@ name: Deploy with Skaffold via SSH
 on:
   push:
     branches:
-      - main   # or whatever branch you deploy from
+      - master   # or whatever branch you deploy from
+  workflow_dispatch:
 
 jobs:
   deploy:

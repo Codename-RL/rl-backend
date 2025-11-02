@@ -14,13 +14,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: SSH into server and deploy
+      - name: Install Cloudflared
+        run: |
+          echo "===> Installing Cloudflared"
+          curl -L https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -o cloudflared
+          chmod +x cloudflared
+          sudo mv cloudflared /usr/local/bin/cloudflared
+
+      - name: SSH into server via Cloudflare and deploy
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
+          port: 22
+          proxy_command: "cloudflared access ssh --hostname ${{ secrets.SERVER_HOST }}"
           script: |
             set -e
 
@@ -34,7 +42,7 @@ jobs:
             if ! command -v skaffold &> /dev/null; then
               echo "Skaffold not found, installing..."
               curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
-              install skaffold $HOME/bin/
+              install skaffold $HOME/ bin/
             fi
 
             echo "===> Running Skaffold"

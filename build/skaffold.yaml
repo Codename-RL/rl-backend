@@ -19,9 +19,9 @@ deploy:
 
 manifests:
   rawYaml:
-    - build/k8s/app/*.yaml
+#    - build/k8s/app/*.yaml
     - build/k8s/db/*.yaml
-    - build/k8s/lgtm/*.yaml
+#    - build/k8s/lgtm/*.yaml
 
 portForward:
   - resourceType: service

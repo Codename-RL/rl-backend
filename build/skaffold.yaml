@@ -1,0 +1,30 @@
+apiVersion: skaffold/v4beta11
+kind: Config
+metadata:
+  name: rl
+build:
+  artifacts:
+    - image: lafavela/codename-rl
+      context: .
+      docker:
+        dockerfile: build/Dockerfile
+  local:
+    push: false
+
+
+deploy:
+  kubectl: { }
+  helm :
+    releases:
+
+manifests:
+  rawYaml:
+    - build/k8s/app/*.yaml
+    - build/k8s/db/*.yaml
+    - build/k8s/lgtm/*.yaml
+
+portForward:
+  - resourceType: service
+    resourceName: postgres
+    port: 5432
+    localPort: 5432

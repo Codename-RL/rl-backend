@@ -42,4 +42,4 @@ jobs:
 
             echo "===> Running Skaffold"
             # NOTE: You might want to use `skaffold run` for production instead of dev
-            skaffold dev -f build/skaffold.yaml --no-prune=false --cache-artifacts=true --kubeconfig=$HOME/.kube/config
+            skaffold run -f build/skaffold.yaml --no-prune=false --cache-artifacts=true --kubeconfig=$HOME/.kube/config

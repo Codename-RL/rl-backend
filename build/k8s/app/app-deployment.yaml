@@ -23,6 +23,9 @@ spec:
           imagePullPolicy: Never
           ports:
             - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: rl-config
 ---
 apiVersion: v1
 kind: Service

@@ -8,6 +8,9 @@ build:
       context: .
       docker:
         dockerfile: build/Dockerfile
+      hooks:
+        after:
+          - command: [ "bash", "-c", "docker save lafavela/codename-rl | sudo k3s ctr images import -" ]
   local:
     push: false
 

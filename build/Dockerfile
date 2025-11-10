@@ -8,6 +8,8 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -o app ./cmd/app
 
 FROM alpine:latest
+RUN apk add --no-cache tzdata
+
 WORKDIR /root/
 COPY --from=builder /app/app .
 COPY config.json .

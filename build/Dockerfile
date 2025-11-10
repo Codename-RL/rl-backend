@@ -10,4 +10,5 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o app ./cmd/app
 FROM alpine:latest
 WORKDIR /root/
 COPY --from=builder /app/app .
+COPY config.json .
 CMD ["./app"]

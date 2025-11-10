@@ -20,7 +20,7 @@ spec:
           # with the actual name and tag you will use for your Docker image.
           # If running locally, you might use just 'go-app-image:latest'.
           image: lafavela/codename-rl:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
           envFrom:

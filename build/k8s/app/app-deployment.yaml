@@ -19,7 +19,7 @@ spec:
           # NOTE: You must replace 'your-registry-username/go-app-image:latest'
           # with the actual name and tag you will use for your Docker image.
           # If running locally, you might use just 'go-app-image:latest'.
-          image: rl-app:latest
+          image: lafavela/codename-rl
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

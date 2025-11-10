@@ -1,21 +1,35 @@
-package app
+package main
 
 import (
+	"codename-rl/internal/config"
 	"fmt"
 )
 
-//TIP <p>To run your code, right-click the code and select <b>Run</b>.</p> <p>Alternatively, click
-// the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.</p>
-
 func main() {
-	//TIP <p>Press <shortcut actionId="ShowIntentionActions"/> when your caret is at the underlined text
-	// to see how GoLand suggests fixing the warning.</p><p>Alternatively, if available, click the lightbulb to view possible fixes.</p>
-	s := "gopher"
-	fmt.Printf("Hello and welcome, %s!\n", s)
+	viperConfig := config.NewViper()
+	log := config.NewLogger(viperConfig)
+	db := config.NewDatabase(viperConfig, log)
+	validate := config.NewValidator(viperConfig)
+	app := config.NewFiber(viperConfig)
+	jwt := config.NewJwt(viperConfig)
 
-	for i := 1; i <= 5; i++ {
-		//TIP <p>To start your debugging session, right-click your code in the editor and select the Debug option.</p> <p>We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-		// for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.</p>
-		fmt.Println("i =", 100/i)
+	migrationErr := config.NewDatabaseMigration(db, log)
+	if migrationErr != nil {
+		log.Errorf("Failed to start migration: %v", migrationErr)
+	}
+
+	config.Bootstrap(&config.BootstrapConfig{
+		DB:         db,
+		App:        app,
+		Log:        log,
+		Validate:   validate,
+		Config:     viperConfig,
+		JWTService: jwt,
+	})
+
+	appPort := viperConfig.GetInt("server.port")
+	err := app.Listen(fmt.Sprintf(":%d", appPort))
+	if err != nil {
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }

@@ -1,0 +1,27 @@
+{
+  "app": {
+    "name": "codename-rl"
+  },
+  "server": {
+    "prefork": false,
+    "port": 8080
+  },
+  "log": {
+    "level": 6
+  },
+  "database": {
+    "username": "user",
+    "password": "",
+    "host": "localhost",
+    "port": 5432,
+    "name": "rl",
+    "pool": {
+      "idle": 10,
+      "max": 100,
+      "lifetime": 300
+    }
+  },
+  "jwt" : {
+    "secret" : "very-very-secret-jwt"
+  }
+}

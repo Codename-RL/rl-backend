@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rl-app-deployment
+  labels:
+    app: rl-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rl-app
+  template:
+    metadata:
+      labels:
+        app: rl-app
+    spec:
+      containers:
+        - name: rl-app
+          # NOTE: You must replace 'your-registry-username/go-app-image:latest'
+          # with the actual name and tag you will use for your Docker image.
+          # If running locally, you might use just 'go-app-image:latest'.
+          image: rl-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rl-app-service
+spec:
+  selector:
+    app: rl-app
+  type: ClusterIP
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

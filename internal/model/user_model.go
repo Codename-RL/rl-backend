@@ -26,12 +26,12 @@ type UpdateUserRequest struct {
 	Email      string `json:"email,omitempty"`
 	Name       string `json:"name,omitempty"`
 	Avatar     string `json:"avatar,omitempty"`
-	Password   string `json:"password,omitempty"`
 	Token      string `json:"token,omitempty"`
 	VerifiedAt string `json:"verified_at,omitempty"`
 }
 type UpdateUserPasswordRequest struct {
 	ID       string `json:"-"`
+	Token    string `json:"token" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
 

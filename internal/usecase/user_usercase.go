@@ -7,6 +7,7 @@ import (
 	"codename-rl/internal/pkg/auth"
 	"codename-rl/internal/repository"
 	"context"
+	"time"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -21,16 +22,18 @@ type UserUseCase struct {
 	Log            *logrus.Logger
 	Validate       *validator.Validate
 	UserRepository *repository.UserRepository
+	OtpRepository  *repository.OtpRepository
 	JWTService     *auth.JwtService
 }
 
 func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
-	userRepository *repository.UserRepository, JWTService *auth.JwtService) *UserUseCase {
+	userRepository *repository.UserRepository, OtpRepository *repository.OtpRepository, JWTService *auth.JwtService) *UserUseCase {
 	return &UserUseCase{
 		DB:             db,
 		Log:            logger,
 		Validate:       validate,
 		UserRepository: userRepository,
+		OtpRepository:  OtpRepository,
 		JWTService:     JWTService,
 	}
 }
@@ -126,7 +129,7 @@ func (c *UserUseCase) Login(ctx context.Context, request *model.LoginUserRequest
 		return nil, fiber.ErrUnauthorized
 	}
 
-	token, err := c.JWTService.GenerateToken(user)
+	token, err := c.JWTService.GenerateToken(user, 24*time.Hour)
 	if err != nil {
 		c.Log.Errorf("Failed to generate token : %+v", err)
 		return nil, fiber.ErrInternalServerError
@@ -208,10 +211,44 @@ func (c *UserUseCase) Update(ctx context.Context, request *model.UpdateUserReque
 		user.Name = request.Name
 	}
 
+	if err := c.UserRepository.Update(tx, user); err != nil {
+		c.Log.Warnf("Failed save user : %+v", err)
+		return nil, fiber.ErrInternalServerError
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		c.Log.Warnf("Failed commit transaction : %+v", err)
+		return nil, fiber.ErrInternalServerError
+	}
+
+	return converter.UserToResponse(user), nil
+}
+
+func (c *UserUseCase) UpdatePassword(ctx context.Context, request *model.UpdateUserPasswordRequest) (*model.UserResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+	if err := c.Validate.Struct(request); err != nil {
+		c.Log.Warnf("Invalid request body : %+v", err)
+		return nil, fiber.ErrBadRequest
+	}
+
+	otp := new(entity.Otp)
+	if err := c.OtpRepository.FindByToken(ctx, tx, otp, request.Token); err != nil {
+		c.Log.Warnf("Failed find OTP by token : %+v", err)
+		return nil, fiber.ErrNotFound
+	}
+	request.ID = otp.UserID
+
+	user := new(entity.User)
+	if err := c.UserRepository.FindById(tx, user, request.ID); err != nil {
+		c.Log.Warnf("Failed find user by id : %+v", err)
+		return nil, fiber.ErrNotFound
+	}
+
 	if request.Password != "" {
 		password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 		if err != nil {
-			c.Log.Warnf("Failed to generate bcrype hash : %+v", err)
+			c.Log.Warnf("Failed to generate bcrypt hash : %+v", err)
 			return nil, fiber.ErrInternalServerError
 		}
 		user.Password = string(password)

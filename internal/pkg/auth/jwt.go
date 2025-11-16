@@ -20,9 +20,8 @@ func NewJwtService(secret string) *JwtService {
 	return &JwtService{secret: []byte(secret)}
 }
 
-func (r *JwtService) GenerateToken(user *entity.User) (string, error) {
-	// Set the expiration time for the token (e.g., 24 hours).
-	expirationTime := time.Now().Add(24 * time.Hour)
+func (r *JwtService) GenerateToken(user *entity.User, expiresIn time.Duration) (string, error) {
+	expirationTime := time.Now().Add(expiresIn)
 
 	claims := &JwtClaims{
 		ID: user.ID,

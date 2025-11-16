@@ -19,17 +19,23 @@ func (c *Config) Setup() {
 }
 
 func (c *Config) SetupGuestRoute() {
+	// User
 	c.App.Post("/api/users", c.UserController.Register)
 	c.App.Post("/api/users/_login", c.UserController.Login)
+
+	// OTP
 	c.App.Post("/api/users/_otp", c.OtpController.CreateOtp)
 	c.App.Post("/api/users/_otp/forgot", c.OtpController.VerifyOtpForgotPassword)
 	c.App.Patch("/api/users/_password", c.UserController.UpdatePassword)
 }
 
 func (c *Config) SetupAuthRoute() {
+	// Middleware
 	c.App.Use(c.AuthMiddleware)
 	c.App.Delete("/api/users", c.UserController.Logout)
 	c.App.Patch("/api/users/_current", c.UserController.Update)
 	c.App.Get("/api/users/_current", c.UserController.Current)
+
+	// OTP
 	c.App.Post("/api/users/_otp/verify", c.OtpController.VerifyOtpUser)
 }

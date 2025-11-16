@@ -21,7 +21,14 @@
       "lifetime": 300
     }
   },
-  "jwt" : {
-    "secret" : "very-very-secret-jwt"
+  "jwt": {
+    "secret": "very-very-secret-jwt"
+  },
+  "smtp": {
+    "host": "localhost",
+    "port": 1025,
+    "email": "default@example.com",
+    "password": "default",
+    "from": "Local SMTP"
   }
 }

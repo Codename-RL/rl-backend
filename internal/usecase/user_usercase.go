@@ -237,8 +237,8 @@ func (c *UserUseCase) UpdatePassword(ctx context.Context, request *model.UpdateU
 		c.Log.Warnf("Failed find OTP by token : %+v", err)
 		return nil, fiber.ErrNotFound
 	}
-	request.ID = otp.UserID
 
+	request.ID = otp.UserID
 	user := new(entity.User)
 	if err := c.UserRepository.FindById(tx, user, request.ID); err != nil {
 		c.Log.Warnf("Failed find user by id : %+v", err)
@@ -256,6 +256,11 @@ func (c *UserUseCase) UpdatePassword(ctx context.Context, request *model.UpdateU
 
 	if err := c.UserRepository.Update(tx, user); err != nil {
 		c.Log.Warnf("Failed save user : %+v", err)
+		return nil, fiber.ErrInternalServerError
+	}
+
+	if err := c.OtpRepository.DeleteByUserID(ctx, tx, user.ID); err != nil {
+		c.Log.Warnf("Failed delete OTP by id : %+v", err)
 		return nil, fiber.ErrInternalServerError
 	}
 

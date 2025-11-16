@@ -12,6 +12,7 @@ func main() {
 	validate := config.NewValidator(viperConfig)
 	app := config.NewFiber(viperConfig)
 	jwt := config.NewJwt(viperConfig)
+	emailClient := config.NewEmail(viperConfig, log)
 
 	migrationErr := config.NewDatabaseMigration(db, log)
 	if migrationErr != nil {
@@ -19,12 +20,13 @@ func main() {
 	}
 
 	config.Bootstrap(&config.BootstrapConfig{
-		DB:         db,
-		App:        app,
-		Log:        log,
-		Validate:   validate,
-		Config:     viperConfig,
-		JWTService: jwt,
+		DB:          db,
+		App:         app,
+		Log:         log,
+		Validate:    validate,
+		Config:      viperConfig,
+		EmailClient: emailClient,
+		JWTService:  jwt,
 	})
 
 	appPort := viperConfig.GetInt("server.port")

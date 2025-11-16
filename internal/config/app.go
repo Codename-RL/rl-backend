@@ -5,6 +5,7 @@ import (
 	"codename-rl/internal/delivery/http/middleware"
 	"codename-rl/internal/delivery/http/route"
 	"codename-rl/internal/pkg/auth"
+	"codename-rl/internal/pkg/email"
 	"codename-rl/internal/repository"
 	"codename-rl/internal/usecase"
 
@@ -16,12 +17,13 @@ import (
 )
 
 type BootstrapConfig struct {
-	DB         *gorm.DB
-	App        *fiber.App
-	Log        *logrus.Logger
-	Validate   *validator.Validate
-	JWTService *auth.JwtService
-	Config     *viper.Viper
+	DB          *gorm.DB
+	App         *fiber.App
+	Log         *logrus.Logger
+	Validate    *validator.Validate
+	JWTService  *auth.JwtService
+	EmailClient *email.Client
+	Config      *viper.Viper
 }
 
 func Bootstrap(config *BootstrapConfig) {
@@ -31,7 +33,7 @@ func Bootstrap(config *BootstrapConfig) {
 
 	// setup use cases
 	userUseCase := usecase.NewUserUseCase(config.DB, config.Log, config.Validate, userRepository, OtpRepository, config.JWTService)
-	otpUseCase := usecase.NewOtpUseCase(config.DB, config.Log, config.Validate, OtpRepository, userRepository, config.JWTService)
+	otpUseCase := usecase.NewOtpUseCase(config.DB, config.Log, config.Validate, OtpRepository, userRepository, config.EmailClient, config.JWTService)
 
 	// setup controller
 	userController := handler.NewUserController(userUseCase, config.Log)

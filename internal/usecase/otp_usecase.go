@@ -5,6 +5,7 @@ import (
 	"codename-rl/internal/model"
 	"codename-rl/internal/model/converter"
 	"codename-rl/internal/pkg/auth"
+	"codename-rl/internal/pkg/email"
 	"codename-rl/internal/pkg/utils"
 	"codename-rl/internal/repository"
 	"context"
@@ -24,17 +25,19 @@ type OtpUseCase struct {
 	Validate       *validator.Validate
 	OtpRepository  *repository.OtpRepository
 	UserRepository *repository.UserRepository
+	EmailClient    *email.Client
 	JWTService     *auth.JwtService
 }
 
 func NewOtpUseCase(db *gorm.DB, logger *logrus.Logger, validate *validator.Validate,
-	otpRepository *repository.OtpRepository, UserRepository *repository.UserRepository, JWTService *auth.JwtService) *OtpUseCase {
+	otpRepository *repository.OtpRepository, UserRepository *repository.UserRepository, emailClient *email.Client, JWTService *auth.JwtService) *OtpUseCase {
 	return &OtpUseCase{
 		DB:             db,
 		Log:            logger,
 		Validate:       validate,
 		OtpRepository:  otpRepository,
 		UserRepository: UserRepository,
+		EmailClient:    emailClient,
 		JWTService:     JWTService,
 	}
 }
@@ -87,6 +90,10 @@ func (c *OtpUseCase) Create(ctx context.Context, request *model.CreateOtpRequest
 	}
 
 	// send email here
+	if err := c.EmailClient.SendOTP(request.Email, otpNumeric); err != nil {
+		c.Log.Warnf("Failed to send OTP to email : %+v", err)
+		return nil, fiber.ErrInternalServerError
+	}
 
 	if err := tx.Commit().Error; err != nil {
 		c.Log.Warnf("Failed commit transaction : %+v", err)
@@ -134,6 +141,11 @@ func (c *OtpUseCase) VerifyUser(ctx context.Context, request *model.VerifyOtpReq
 	otp.VerifiedAt = time.Now().Unix()
 	if err = c.OtpRepository.Update(tx, otp); err != nil {
 		c.Log.Errorf("Failed to update OTP: %v", err)
+		return nil, fiber.ErrInternalServerError
+	}
+
+	if err = c.OtpRepository.DeleteByToken(ctx, tx, otp.Token); err != nil {
+		c.Log.Warnf("Failed delete OTP by id : %+v", err)
 		return nil, fiber.ErrInternalServerError
 	}
 

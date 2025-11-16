@@ -128,9 +128,6 @@ func (c *UserController) UpdatePassword(ctx *fiber.Ctx) error {
 		return ctx.Status(fiber.StatusBadRequest).JSON(resp)
 	}
 
-	auth := middleware.GetUser(ctx)
-	request.ID = auth.ID
-
 	responseData, err := c.UseCase.UpdatePassword(ctx.UserContext(), request)
 	if err != nil {
 		c.Log.WithError(err).Warnf("Failed to update user")

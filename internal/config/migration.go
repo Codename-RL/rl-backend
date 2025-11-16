@@ -1,6 +1,7 @@
 package config
 
 import (
+	"codename-rl/internal/entity"
 	"codename-rl/internal/repository"
 
 	"github.com/sirupsen/logrus"
@@ -9,10 +10,16 @@ import (
 
 func NewDatabaseMigration(db *gorm.DB, log *logrus.Logger) error {
 	log.Info("Running database migrations...")
-	if err := repository.AutoMigrate(db); err != nil {
+
+	if err := repository.AutoMigrate(
+		db,
+		&entity.User{},
+		&entity.Otp{},
+	); err != nil {
 		log.Fatalf("Failed to run database migrations: %v", err)
 		return err
 	}
+
 	log.Info("Database migrations completed successfully.")
 	return nil
 }

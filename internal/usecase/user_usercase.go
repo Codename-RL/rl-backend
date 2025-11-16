@@ -5,6 +5,7 @@ import (
 	"codename-rl/internal/model"
 	"codename-rl/internal/model/converter"
 	"codename-rl/internal/pkg/auth"
+	"codename-rl/internal/pkg/utils"
 	"codename-rl/internal/repository"
 	"context"
 	"time"
@@ -13,7 +14,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -83,7 +83,7 @@ func (c *UserUseCase) Create(ctx context.Context, request *model.RegisterUserReq
 		return nil, fiber.ErrConflict
 	}
 
-	password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	password, err := utils.HashPassword(request.Password)
 	if err != nil {
 		c.Log.Warnf("Failed to generate bcrype hash : %+v", err)
 		return nil, fiber.ErrInternalServerError
@@ -124,7 +124,7 @@ func (c *UserUseCase) Login(ctx context.Context, request *model.LoginUserRequest
 		return nil, fiber.ErrUnauthorized
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(request.Password)); err != nil {
+	if err := utils.ComparePassword(user.Password, request.Password); err != nil {
 		c.Log.Warnf("Failed to compare user password with bcrype hash : %+v", err)
 		return nil, fiber.ErrUnauthorized
 	}
@@ -246,7 +246,7 @@ func (c *UserUseCase) UpdatePassword(ctx context.Context, request *model.UpdateU
 	}
 
 	if request.Password != "" {
-		password, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+		password, err := utils.HashPassword(request.Password)
 		if err != nil {
 			c.Log.Warnf("Failed to generate bcrypt hash : %+v", err)
 			return nil, fiber.ErrInternalServerError

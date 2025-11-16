@@ -67,7 +67,7 @@ func (c *OtpUseCase) Create(ctx context.Context, request *model.CreateOtpRequest
 		return nil, fiber.ErrInternalServerError
 	}
 
-	otpHashed, err := bcrypt.GenerateFromPassword([]byte(otpNumeric), bcrypt.DefaultCost)
+	otpHashed, err := utils.HashPassword(otpNumeric)
 	if err != nil {
 		c.Log.Warnf("Failed to generate bcrypt hash : %+v", err)
 		return nil, fiber.ErrInternalServerError
@@ -121,7 +121,7 @@ func (c *OtpUseCase) VerifyUser(ctx context.Context, request *model.VerifyOtpReq
 		return nil, fiber.ErrBadRequest
 	}
 
-	if err = bcrypt.CompareHashAndPassword([]byte(otp.Otp), []byte(request.Otp)); err != nil {
+	if err = utils.ComparePassword(otp.Otp, request.Otp); err != nil {
 		c.Log.Warnf("Failed to compare OTP hash : %+v", err)
 		return nil, fiber.ErrUnauthorized
 	}

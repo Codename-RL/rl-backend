@@ -11,6 +11,9 @@ type User struct {
 	CreatedAt  int64  `gorm:"column:created_at;autoCreateTime:milli"`
 	UpdatedAt  int64  `gorm:"column:updated_at;autoCreateTime:milli;autoUpdateTime:milli"`
 	Token      string `gorm:"-"`
+
+	Otps    []Otp    `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
+	Persons []Person `gorm:"foreignKey:UserID;constraint:OnUpdate:CASCADE,OnDelete:SET NULL"`
 }
 
 func (u *User) TableName() string {

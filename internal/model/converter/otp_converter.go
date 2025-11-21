@@ -6,6 +6,10 @@ import (
 )
 
 func OtpToResponse(otp *entity.Otp) *model.OtpResponse {
+	if otp == nil {
+		return nil
+	}
+
 	return &model.OtpResponse{
 		ID:        otp.ID,
 		UserID:    otp.UserID,

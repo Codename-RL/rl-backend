@@ -6,6 +6,10 @@ import (
 )
 
 func UserToResponse(user *entity.User) *model.UserResponse {
+	if user == nil {
+		return nil
+	}
+
 	return &model.UserResponse{
 		ID:         user.ID,
 		Email:      user.Email,
@@ -18,6 +22,10 @@ func UserToResponse(user *entity.User) *model.UserResponse {
 }
 
 func UserToTokenResponse(user *entity.User) *model.UserResponse {
+	if user == nil {
+		return nil
+	}
+
 	return &model.UserResponse{
 		Token: user.Token,
 	}

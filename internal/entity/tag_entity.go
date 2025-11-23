@@ -11,7 +11,7 @@ type Tag struct {
 	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime;type:timestamptz"`
 	UpdatedAt time.Time `gorm:"column:updated_at;autoUpdateTime;type:timestamptz"`
 
-	Persons []Person `gorm:"many2many:person_tags"`
+	Persons []Person `gorm:"many2many:persons_tags"`
 	User    *User    `gorm:"foreignKey:UserID;references:ID"`
 }
 

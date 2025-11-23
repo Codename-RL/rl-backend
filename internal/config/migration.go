@@ -15,6 +15,7 @@ func NewDatabaseMigration(db *gorm.DB, log *logrus.Logger) error {
 		db,
 		&entity.User{},
 		&entity.Otp{},
+		&entity.Person{},
 		&entity.Tag{},
 	); err != nil {
 		log.Fatalf("Failed to run database migrations: %v", err)

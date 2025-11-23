@@ -22,7 +22,7 @@ type CreateTagRequest struct {
 
 type UpdateTagRequest struct {
 	ID        string   `json:"id" validate:"required"`
-	Name      string   `json:"name" validate:"required"`
+	Name      string   `json:"name"`
 	PersonIDs []string `json:"person_ids"`
 	UserID    string   `json:"-"`
 }

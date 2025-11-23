@@ -30,14 +30,17 @@ func Bootstrap(config *BootstrapConfig) {
 	// setup repositories
 	userRepository := repository.NewUserRepository(config.Log)
 	OtpRepository := repository.NewOtpRepository(config.Log)
+	TagRepository := repository.NewTagRepository(config.Log)
 
 	// setup use cases
 	userUseCase := usecase.NewUserUseCase(config.DB, config.Log, config.Validate, userRepository, OtpRepository, config.JWTService)
 	otpUseCase := usecase.NewOtpUseCase(config.DB, config.Log, config.Validate, OtpRepository, userRepository, config.EmailClient, config.JWTService)
+	tagUseCase := usecase.NewTagUseCase(config.DB, config.Log, config.Validate, TagRepository, config.JWTService)
 
 	// setup controller
 	userController := handler.NewUserController(userUseCase, config.Log)
 	otpController := handler.NewOtpController(otpUseCase, config.Log)
+	tagHandler := handler.NewTagHandler(tagUseCase, config.Log)
 
 	// setup middleware
 	authMiddleware := middleware.NewAuth(userUseCase)
@@ -46,6 +49,7 @@ func Bootstrap(config *BootstrapConfig) {
 		App:            config.App,
 		UserController: userController,
 		OtpController:  otpController,
+		TagController:  tagHandler,
 		AuthMiddleware: authMiddleware,
 	}
 	routeConfig.Setup()

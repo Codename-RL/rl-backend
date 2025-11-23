@@ -1,21 +1,23 @@
 package model
 
 type BaseResponse[T any] struct {
-	Message   string        `json:"message"`
-	Data      T             `json:"data,omitempty"`
-	Paging    *PageMetadata `json:"paging,omitempty"`
-	Errors    string        `json:"errors,omitempty"`
-	Timestamp string        `json:"timestamp"`
+	Message      string          `json:"message"`
+	Data         T               `json:"data,omitempty"`
+	PageMetadata *PaginationMeta `json:"meta,omitempty"`
+	Errors       string          `json:"errors,omitempty"`
+	Timestamp    string          `json:"timestamp"`
 }
 
 type PageResponse[T any] struct {
-	Data         []T          `json:"data,omitempty"`
-	PageMetadata PageMetadata `json:"paging,omitempty"`
+	Message      string         `json:"message"`
+	Data         []T            `json:"data,omitempty"`
+	PageMetadata PaginationMeta `json:"meta,omitempty"`
+	Timestamp    string         `json:"timestamp"`
 }
 
-type PageMetadata struct {
-	Page      int   `json:"page"`
-	Size      int   `json:"size"`
-	TotalItem int64 `json:"total_item"`
-	TotalPage int64 `json:"total_page"`
+type PaginationMeta struct {
+	Total      int64 `json:"total"`
+	Page       int   `json:"page"`
+	PageSize   int   `json:"page_size"`
+	TotalPages int64 `json:"total_pages"`
 }

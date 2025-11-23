@@ -32,3 +32,21 @@ func WriteJSON[T any](w http.ResponseWriter, status int, resp *model.BaseRespons
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(resp)
 }
+
+func NewPaginatedResponse[T any](message string, data []T, total int64, page int, pageSize int) *model.BaseResponse[[]T] {
+
+	totalPages := int64((total + int64(pageSize) - 1) / int64(pageSize))
+	meta := model.PaginationMeta{
+		Total:      total,
+		Page:       page,
+		PageSize:   pageSize,
+		TotalPages: totalPages,
+	}
+
+	return &model.BaseResponse[[]T]{
+		Message:      message,
+		Data:         data,
+		Timestamp:    time.Now().UTC().Format(time.RFC3339Nano),
+		PageMetadata: &meta,
+	}
+}

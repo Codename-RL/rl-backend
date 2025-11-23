@@ -10,6 +10,7 @@ type Config struct {
 	App            *fiber.App
 	UserController *handler.UserController
 	OtpController  *handler.OtpController
+	TagController  *handler.TagHandler
 	AuthMiddleware fiber.Handler
 }
 
@@ -38,4 +39,10 @@ func (c *Config) SetupAuthRoute() {
 
 	// OTP
 	c.App.Post("/api/users/_otp/verify", c.OtpController.VerifyOtpUser)
+
+	//Tags
+	c.App.Post("/api/tags", c.TagController.Create)
+	c.App.Get("/api/tags", c.TagController.Get)
+	c.App.Patch("/api/tags", c.TagController.Update)
+	c.App.Delete("/api/tags", c.TagController.Delete)
 }

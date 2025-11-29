@@ -7,12 +7,13 @@ import (
 )
 
 type Config struct {
-	App              *fiber.App
-	UserController   *handler.UserController
-	OtpController    *handler.OtpController
-	TagController    *handler.TagHandler
-	PersonController *handler.PersonHandler
-	AuthMiddleware   fiber.Handler
+	App                    *fiber.App
+	UserController         *handler.UserController
+	OtpController          *handler.OtpController
+	TagController          *handler.TagHandler
+	PersonController       *handler.PersonHandler
+	RelationshipController *handler.RelationshipHandler
+	AuthMiddleware         fiber.Handler
 }
 
 func (c *Config) Setup() {
@@ -52,4 +53,10 @@ func (c *Config) SetupAuthRoute() {
 	c.App.Get("/api/persons", c.PersonController.Get)
 	c.App.Patch("/api/persons", c.PersonController.Update)
 	c.App.Delete("/api/persons", c.PersonController.Delete)
+
+	//Relationships
+	c.App.Post("/api/relationships", c.RelationshipController.Create)
+	c.App.Get("/api/relationships", c.RelationshipController.Get)
+	c.App.Patch("/api/relationships", c.RelationshipController.Update)
+	c.App.Delete("/api/relationships", c.RelationshipController.Delete)
 }

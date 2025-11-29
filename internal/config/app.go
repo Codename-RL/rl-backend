@@ -32,29 +32,33 @@ func Bootstrap(config *BootstrapConfig) {
 	otpRepository := repository.NewOtpRepository(config.Log)
 	tagRepository := repository.NewTagRepository(config.Log)
 	personRepository := repository.NewPersonRepository(config.Log)
+	relationshipRepository := repository.NewRelationshipRepository(config.Log)
 
 	// setup use cases
 	userUseCase := usecase.NewUserUseCase(config.DB, config.Log, config.Validate, userRepository, otpRepository, config.JWTService)
 	otpUseCase := usecase.NewOtpUseCase(config.DB, config.Log, config.Validate, otpRepository, userRepository, config.EmailClient, config.JWTService)
 	tagUseCase := usecase.NewTagUseCase(config.DB, config.Log, config.Validate, tagRepository, config.JWTService)
 	personUseCase := usecase.NewPersonUseCase(config.DB, config.Log, config.Validate, personRepository, config.JWTService)
+	relationshipUseCase := usecase.NewRelationshipUseCase(config.DB, config.Log, config.Validate, relationshipRepository, config.JWTService)
 
 	// setup controller
 	userController := handler.NewUserController(userUseCase, config.Log)
 	otpController := handler.NewOtpController(otpUseCase, config.Log)
 	tagHandler := handler.NewTagHandler(tagUseCase, config.Log)
 	personHandler := handler.NewPersonHandler(personUseCase, config.Log)
+	relationshipHandler := handler.NewRelationshipHandler(relationshipUseCase, config.Log)
 
 	// setup middleware
 	authMiddleware := middleware.NewAuth(userUseCase)
 
 	routeConfig := route.Config{
-		App:              config.App,
-		UserController:   userController,
-		OtpController:    otpController,
-		TagController:    tagHandler,
-		PersonController: personHandler,
-		AuthMiddleware:   authMiddleware,
+		App:                    config.App,
+		UserController:         userController,
+		OtpController:          otpController,
+		TagController:          tagHandler,
+		PersonController:       personHandler,
+		RelationshipController: relationshipHandler,
+		AuthMiddleware:         authMiddleware,
 	}
 	routeConfig.Setup()
 }

@@ -33,7 +33,8 @@ func Bootstrap(config *BootstrapConfig) {
 	tagRepository := repository.NewTagRepository(config.Log)
 	personRepository := repository.NewPersonRepository(config.Log)
 	relationshipRepository := repository.NewRelationshipRepository(config.Log)
-	PhoneRepository := repository.NewPhoneRepository(config.Log)
+	phoneRepository := repository.NewPhoneRepository(config.Log)
+	importantDateRepository := repository.NewImportantDateRepository(config.Log)
 
 	// setup use cases
 	userUseCase := usecase.NewUserUseCase(config.DB, config.Log, config.Validate, userRepository, otpRepository, config.JWTService)
@@ -41,7 +42,8 @@ func Bootstrap(config *BootstrapConfig) {
 	tagUseCase := usecase.NewTagUseCase(config.DB, config.Log, config.Validate, tagRepository, config.JWTService)
 	personUseCase := usecase.NewPersonUseCase(config.DB, config.Log, config.Validate, personRepository, config.JWTService)
 	relationshipUseCase := usecase.NewRelationshipUseCase(config.DB, config.Log, config.Validate, relationshipRepository, config.JWTService)
-	phoneUseCase := usecase.NewPhoneUseCase(config.DB, config.Log, config.Validate, PhoneRepository, config.JWTService)
+	phoneUseCase := usecase.NewPhoneUseCase(config.DB, config.Log, config.Validate, phoneRepository, config.JWTService)
+	importantDateUseCase := usecase.NewImportantDateUseCase(config.DB, config.Log, config.Validate, importantDateRepository, config.JWTService)
 
 	// setup controller
 	userController := handler.NewUserController(userUseCase, config.Log)
@@ -50,19 +52,21 @@ func Bootstrap(config *BootstrapConfig) {
 	personHandler := handler.NewPersonHandler(personUseCase, config.Log)
 	relationshipHandler := handler.NewRelationshipHandler(relationshipUseCase, config.Log)
 	phoneHandler := handler.NewPhoneHandler(phoneUseCase, config.Log)
+	importantDateHandler := handler.NewImportantDateHandler(importantDateUseCase, config.Log)
 
 	// setup middleware
 	authMiddleware := middleware.NewAuth(userUseCase)
 
 	routeConfig := route.Config{
-		App:                    config.App,
-		UserController:         userController,
-		OtpController:          otpController,
-		TagController:          tagHandler,
-		PersonController:       personHandler,
-		RelationshipController: relationshipHandler,
-		PhoneController:        phoneHandler,
-		AuthMiddleware:         authMiddleware,
+		App:                     config.App,
+		UserController:          userController,
+		OtpController:           otpController,
+		TagController:           tagHandler,
+		PersonController:        personHandler,
+		RelationshipController:  relationshipHandler,
+		PhoneController:         phoneHandler,
+		ImportantDateController: importantDateHandler,
+		AuthMiddleware:          authMiddleware,
 	}
 	routeConfig.Setup()
 }

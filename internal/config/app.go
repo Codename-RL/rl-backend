@@ -33,6 +33,7 @@ func Bootstrap(config *BootstrapConfig) {
 	tagRepository := repository.NewTagRepository(config.Log)
 	personRepository := repository.NewPersonRepository(config.Log)
 	relationshipRepository := repository.NewRelationshipRepository(config.Log)
+	PhoneRepository := repository.NewPhoneRepository(config.Log)
 
 	// setup use cases
 	userUseCase := usecase.NewUserUseCase(config.DB, config.Log, config.Validate, userRepository, otpRepository, config.JWTService)
@@ -40,6 +41,7 @@ func Bootstrap(config *BootstrapConfig) {
 	tagUseCase := usecase.NewTagUseCase(config.DB, config.Log, config.Validate, tagRepository, config.JWTService)
 	personUseCase := usecase.NewPersonUseCase(config.DB, config.Log, config.Validate, personRepository, config.JWTService)
 	relationshipUseCase := usecase.NewRelationshipUseCase(config.DB, config.Log, config.Validate, relationshipRepository, config.JWTService)
+	phoneUseCase := usecase.NewPhoneUseCase(config.DB, config.Log, config.Validate, PhoneRepository, config.JWTService)
 
 	// setup controller
 	userController := handler.NewUserController(userUseCase, config.Log)
@@ -47,6 +49,7 @@ func Bootstrap(config *BootstrapConfig) {
 	tagHandler := handler.NewTagHandler(tagUseCase, config.Log)
 	personHandler := handler.NewPersonHandler(personUseCase, config.Log)
 	relationshipHandler := handler.NewRelationshipHandler(relationshipUseCase, config.Log)
+	phoneHandler := handler.NewPhoneHandler(phoneUseCase, config.Log)
 
 	// setup middleware
 	authMiddleware := middleware.NewAuth(userUseCase)
@@ -58,6 +61,7 @@ func Bootstrap(config *BootstrapConfig) {
 		TagController:          tagHandler,
 		PersonController:       personHandler,
 		RelationshipController: relationshipHandler,
+		PhoneController:        phoneHandler,
 		AuthMiddleware:         authMiddleware,
 	}
 	routeConfig.Setup()

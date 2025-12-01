@@ -13,6 +13,7 @@ type Config struct {
 	TagController          *handler.TagHandler
 	PersonController       *handler.PersonHandler
 	RelationshipController *handler.RelationshipHandler
+	PhoneController        *handler.PhoneHandler
 	AuthMiddleware         fiber.Handler
 }
 
@@ -59,4 +60,10 @@ func (c *Config) SetupAuthRoute() {
 	c.App.Get("/api/relationships", c.RelationshipController.Get)
 	c.App.Patch("/api/relationships", c.RelationshipController.Update)
 	c.App.Delete("/api/relationships", c.RelationshipController.Delete)
+
+	//Phones
+	c.App.Post("/api/phones", c.PhoneController.Create)
+	c.App.Get("/api/phones", c.PhoneController.Get)
+	c.App.Patch("/api/phones", c.PhoneController.Update)
+	c.App.Delete("/api/phones", c.PhoneController.Delete)
 }
